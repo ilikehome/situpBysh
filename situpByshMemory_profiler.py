@@ -4,6 +4,7 @@ import torch
 from ultralytics import YOLO
 from memory_profiler import profile
 
+def get_pic_center_xy(frame):
     # 获取图片的高度和宽度
     height, width, _ = frame.shape
     # 计算图片的中心坐标
@@ -155,6 +156,7 @@ def main_function():
 
         # 使用模型进行预测
         results = model.predict(frame)
+        center_x, center_y = get_pic_center_xy(frame)
         # 在中心位置绘制一个点
         cv2.circle(frame, (center_x, center_y), 5, (0, 0, 255), -1)
 
