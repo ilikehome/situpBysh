@@ -86,18 +86,14 @@ def process_frame(frame, detector):
                 logging.info("Detected potential start of left slide.")
             else:
                 detector.ret_result = 0
-        if not is_hand_above_shoulder and detector.has_started_slide:
-            detector.has_started_slide = False
-            detector.slide_direction = None
-            logging.info("Hand is below shoulder. Resetting slide.")
-    return selected_person, is_hand_above_shoulder
+    return detector.ret_result
 
 def main():
     # 设置日志
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
     detector = SlideDetector()
-    cap = cv2.VideoCapture('noperson.mp4')
+    cap = cv2.VideoCapture('cam.mp4')
     while cap.isOpened():
         success, frame = cap.read()
         if not success:
@@ -109,7 +105,7 @@ def main():
         new_height = int((new_width / width) * height)
         frame = cv2.resize(frame, (new_width, new_height))
 
-        selected_person, is_hand_above_shoulder = process_frame(frame, detector)
+        ret_result = process_frame(frame, detector)
         logging.info(f"Detected a valid slide! Direction Result: {detector.ret_result}")
         cv2.imshow('Video', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
