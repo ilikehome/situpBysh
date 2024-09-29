@@ -71,11 +71,18 @@ def process_frame(frame):
                         wave_direction = 0
 
 def main():
-    cap = cv2.VideoCapture('wavehand.mp4')
+    cap = cv2.VideoCapture('cam.mp4')
     while cap.isOpened():
         success, frame = cap.read()
         if not success:
             break
+
+        # 调整视频尺寸
+        height, width, _ = frame.shape
+        new_width = 640
+        new_height = int((new_width / width) * height)
+        frame = cv2.resize(frame, (new_width, new_height))
+
         process_frame(frame)
         wave = is_valid_wave(hand_coords, shoulder_width)
         if wave:
