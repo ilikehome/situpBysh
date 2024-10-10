@@ -11,8 +11,8 @@ prev_hip_y = None
 prev_foot_y = None
 prev_hand_head_distance = None
 is_jumping_up = False
-is_hand_correct = False
 is_valid_movement = False
+is_hand_correct = False
 
 # 设置调整后的阈值
 threshold_hip = 0.003
@@ -42,36 +42,28 @@ while cap.isOpened():
 
             if prev_hip_y is not None:
                 if abs(hip_y - prev_hip_y) > threshold_hip:
-                    # 判断脚与髋的运动一致性
-                    if prev_foot_y is not None:
-                        if (hip_y < prev_hip_y and foot_y < prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot) or (hip_y > prev_hip_y and foot_y > prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot):
-                            is_valid_movement = True
-                        else:
-                            is_valid_movement = False
-
-                    # 判断手相对头部的运动方向
-                    cur_left_hand_head_distance = abs(left_hand_y - head_y)
+                    # 判断手向上的时候，髋部是否向上
+                    cur_left_hand_head_distance = abs(left_hand_y - head_y) # 判断手相对头部的运动方向
                     cur_right_hand_head_distance = abs(right_hand_y - head_y)
                     if prev_hand_head_distance is not None:
                         cur_avg_hand_head_distance = (cur_left_hand_head_distance + cur_right_hand_head_distance) / 2
-                        prev_avg_hand_head_distance = prev_hand_head_distance
-                        if hip_y < prev_hip_y and cur_avg_hand_head_distance > prev_avg_hand_head_distance:
-                            is_hand_correct = True
-                        elif hip_y > prev_hip_y and cur_avg_hand_head_distance < prev_avg_hand_head_distance:
-                            is_hand_correct = True
-                        else:
-                            is_hand_correct = False
+                        is_hand_up = cur_avg_hand_head_distance < prev_hand_head_distance
+                        prev_hand_head_distance = (cur_left_hand_head_distance + cur_right_hand_head_distance) / 2
+                        if is_hand_up and not (hip_y < prev_hip_y):
+                            continue
                     else:
                         prev_hand_head_distance = (cur_left_hand_head_distance + cur_right_hand_head_distance) / 2
 
-                    if is_valid_movement and is_hand_correct:
-                        if hip_y < prev_hip_y:
-                            # 判断为向上跳起阶段
-                            is_jumping_up = True
-                        elif is_jumping_up and hip_y > prev_hip_y:
-                            # 判断为落下阶段且之前有向上跳起，认为跳了一次绳
-                            jump_counter += 1
-                            is_jumping_up = False
+                    if prev_foot_y is not None:
+                        if (hip_y < prev_hip_y and foot_y < prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot) or (hip_y > prev_hip_y and foot_y > prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot):# 判断脚与髋的运动一致性
+                            if hip_y < prev_hip_y:
+                                # 判断为向上跳起阶段
+                                is_jumping_up = True
+                            elif is_jumping_up and hip_y > prev_hip_y:
+                                # 判断为落下阶段且之前有向上跳起，认为跳了一次绳
+                                jump_counter += 1
+                                is_jumping_up = False
+
 
             prev_foot_y = foot_y
             prev_hip_y = hip_y
