@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 model = YOLO('yolov8n-pose.pt')
 
-video_path = 'jump3.mp4'
+video_path = 'jump5.mp4'
 cap = cv2.VideoCapture(video_path)
 
 jump_counter = 0
@@ -30,8 +30,6 @@ while cap.isOpened():
 
     for result in results:
         threshold_hip_ok = None
-        hip_hand_same = None
-        hip_foot_same = None
         keypoints = result.keypoints.xyn[0]
         if len(keypoints) > 0:
             # 假设头部和脚部关键点的 y 坐标之差为近似身高
@@ -65,8 +63,7 @@ while cap.isOpened():
                         prev_hand_head_distance = (cur_left_hand_head_distance + cur_right_hand_head_distance) / 2
 
                     if prev_foot_y is not None:
-                        if (hip_y < prev_hip_y and foot_y < prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot) or (hip_y > prev_hip_y and foot_y > prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot):# 判断脚与髋的运动一致性
-                            hip_foot_same = True
+                        if abs(foot_y - prev_foot_y) > threshold_foot:# 判断脚阈值
                             # 判断两脚之间高度差异
                             left_foot_y = keypoints[16][1]
                             right_foot_y = keypoints[15][1]
@@ -79,12 +76,11 @@ while cap.isOpened():
                                 # 判断为落下阶段且之前有向上跳起，认为跳了一次绳
                                 jump_counter += 1
                                 is_jumping_up = False
-                        else:
-                            hip_foot_same = False
+
 
             prev_foot_y = foot_y
             prev_hip_y = hip_y
-        print(f"髋幅度阈值:{threshold_hip_ok}，髋手一致:{hip_hand_same}，髋脚一致:{hip_foot_same}，方向up:{is_jumping_up}，当前髋部高度：{prev_hip_y}，跳绳次数：{jump_counter}")
+        print(f"髋幅度阈值:{threshold_hip_ok}，方向up:{is_jumping_up}，当前髋部高度：{prev_hip_y}，跳绳次数：{jump_counter}")
 
     # 显示视频帧（可选）
     cv2.imshow('Frame', resized_frame)
