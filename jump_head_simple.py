@@ -56,21 +56,16 @@ while cap.isOpened():
                 # 计算阈值 # 设置阈值，动作需要超过这个幅度
                 threshold_head = height * 0.01
                 threshold_foot = height * 0.01
-                foot_diff_threshold = height * 0.06
 
                 threshold_head_ok = abs(head_y - prev_head_y) > threshold_head
                 threshold_foot_ok = abs(foot_y - prev_foot_y) > threshold_foot
                 head_foot_same = (head_y < prev_head_y and foot_y < prev_foot_y) or (head_y > prev_head_y and foot_y > prev_foot_y)
-
-                foot_diff_ok = abs(left_foot_y - right_foot_y) < foot_diff_threshold
 
                 if threshold_head_ok and threshold_foot_ok and head_foot_same:
                     # 判断两脚之间高度差异
                     if head_y < prev_head_y:
                         # 判断为向上跳起阶段
                         is_jumping_up = True
-                        if not foot_diff_ok:
-                            is_jumping_up = None
                     elif is_jumping_up and head_y > prev_head_y:
                         # 判断为落下阶段且之前有向上跳起，认为跳了一次绳
                         jump_counter += 1
