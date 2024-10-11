@@ -35,7 +35,7 @@ while cap.isOpened():
     for result in results:
         threshold_head_ok = None
         threshold_foot_ok = None
-        head_foot_same = None
+        head_foot_same_direction = None
         foot_diff_ok = None
         keypoints = result.keypoints.xyn[0]
         confidences = result.keypoints.conf[0]
@@ -59,9 +59,9 @@ while cap.isOpened():
 
                 threshold_head_ok = abs(head_y - prev_head_y) > threshold_head
                 threshold_foot_ok = abs(foot_y - prev_foot_y) > threshold_foot
-                head_foot_same = (head_y < prev_head_y and foot_y < prev_foot_y) or (head_y > prev_head_y and foot_y > prev_foot_y)
+                head_foot_same_direction = (head_y < prev_head_y and foot_y < prev_foot_y) or (head_y > prev_head_y and foot_y > prev_foot_y)
 
-                if threshold_head_ok and threshold_foot_ok and head_foot_same:
+                if threshold_head_ok and threshold_foot_ok and head_foot_same_direction:
                     # 判断两脚之间高度差异
                     if head_y < prev_head_y:
                         # 判断为向上跳起阶段
@@ -73,7 +73,7 @@ while cap.isOpened():
 
             prev_foot_y = foot_y
             prev_head_y = head_y
-        print(f"头阈值:{threshold_head_ok}，脚阈值:{threshold_foot_ok}，头脚一致:{head_foot_same}，左右脚:{foot_diff_ok}，方向up:{is_jumping_up}，跳绳次数：{jump_counter}")
+        print(f"头阈值:{threshold_head_ok}，脚阈值:{threshold_foot_ok}，头脚一致:{head_foot_same_direction}，左右脚:{foot_diff_ok}，方向up:{is_jumping_up}，跳绳次数：{jump_counter}")
 
     # 显示视频帧（可选）
     cv2.imshow('Frame', resized_frame)
