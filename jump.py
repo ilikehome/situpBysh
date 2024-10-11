@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 model = YOLO('yolov8n-pose.pt')
 
-video_path = 'jump1.mp4'
+video_path = 'jump6.mp4'
 cap = cv2.VideoCapture(video_path)
 
 jump_counter = 0
@@ -78,6 +78,7 @@ while cap.isOpened():
 
     # 显示视频帧（可选）
     cv2.imshow('Frame', resized_frame)
+    time.sleep(0.2)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
