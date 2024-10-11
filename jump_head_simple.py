@@ -56,14 +56,13 @@ while cap.isOpened():
                 # 计算阈值 # 设置阈值，动作需要超过这个幅度
                 threshold_head = height * 0.01
                 threshold_foot = height * 0.01
-                jump_left_right_foot_diff_threshold = height * 0.02
+                foot_diff_threshold = height * 0.06
 
                 threshold_head_ok = abs(head_y - prev_head_y) > threshold_head
                 threshold_foot_ok = abs(foot_y - prev_foot_y) > threshold_foot
                 head_foot_same = (head_y < prev_head_y and foot_y < prev_foot_y) or (head_y > prev_head_y and foot_y > prev_foot_y)
 
-                foot_diff = abs(left_foot_y - right_foot_y)
-                foot_diff_ok = foot_diff < jump_left_right_foot_diff_threshold
+                foot_diff_ok = abs(left_foot_y - right_foot_y) < foot_diff_threshold
 
                 if threshold_head_ok and threshold_foot_ok and head_foot_same:
                     # 判断两脚之间高度差异
@@ -83,7 +82,7 @@ while cap.isOpened():
 
     # 显示视频帧（可选）
     cv2.imshow('Frame', resized_frame)
-    time.sleep(0.5)
+    time.sleep(0.1)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
