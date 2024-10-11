@@ -44,9 +44,9 @@ while cap.isOpened():
 
             if prev_hip_y is not None:
                 # 计算阈值 # 设置阈值，动作需要超过这个幅度
-                threshold_hip = height * 0.005
-                threshold_foot = height * 0.005
-                threshold_hand = height * 0.005
+                threshold_hip = height * 0.01
+                threshold_foot = height * 0.01
+                threshold_hand = height * 0.01
                 jump_left_right_foot_diff_threshold = height * 0.02
 
                 if abs(hip_y - prev_hip_y) > threshold_hip:
