@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 model = YOLO('yolov8n-pose.pt')
 
-video_path = 'jump5.mp4'
+video_path = 'jump6.mp4'
 cap = cv2.VideoCapture(video_path)
 
 jump_counter = 0
