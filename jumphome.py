@@ -70,8 +70,8 @@ while cap.isOpened():
                         prev_hand_head_distance = (cur_left_hand_head_distance + cur_right_hand_head_distance) / 2
 
                     if prev_foot_y is not None:
-                        if (hip_y < prev_hip_y and foot_y < prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot) or (hip_y > prev_hip_y and foot_y > prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot):# 判断脚与髋的运动一致性
-                            hip_foot_same = True
+                        hip_foot_same = (hip_y < prev_hip_y and foot_y < prev_foot_y) or (hip_y > prev_hip_y and foot_y > prev_foot_y)
+                        if hip_foot_same and abs(foot_y - prev_foot_y) > threshold_foot:# 判断脚与髋的运动一致性
                             # 判断两脚之间高度差异
                             left_foot_y = keypoints[16][1]
                             right_foot_y = keypoints[15][1]
@@ -84,8 +84,7 @@ while cap.isOpened():
                                 # 判断为落下阶段且之前有向上跳起，认为跳了一次绳
                                 jump_counter += 1
                                 is_jumping_up = False
-                        else:
-                            hip_foot_same = False
+
 
             prev_foot_y = foot_y
             prev_hip_y = hip_y
