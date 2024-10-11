@@ -1,24 +1,21 @@
+import time
+from threading import Thread
+
 import cv2
 from ultralytics import YOLO
 
 model = YOLO('yolov8n-pose.pt')
 
-video_path = 'jump2.mp4'
+video_path = 'jump1.mp4'
 cap = cv2.VideoCapture(video_path)
 
 jump_counter = 0
 prev_hip_y = None
-prev_foot_y = None
-prev_hand_head_distance = None
+prev_foot_y = None #脚需要和髋动作一致
+prev_hand_head_distance = None #手上提时，髋必定在上提
 is_jumping_up = False
-is_valid_movement = False
-is_hand_correct = False
 
-# 设置调整后的阈值
-threshold_hip = 0.003
-threshold_foot = 0.004  # 脚的阈值
-threshold_hand = 0.003  # 手相对头的阈值
-
+frame_counter = 0
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -34,6 +31,11 @@ while cap.isOpened():
     for result in results:
         keypoints = result.keypoints.xyn[0]
         if len(keypoints) > 0:
+            # 假设头部和脚部关键点的 y 坐标之差为近似身高
+            head_y = keypoints[0][1]
+            foot_y = keypoints[15][1]
+            height = abs(foot_y - head_y)
+
             hip_y = keypoints[8][1]
             foot_y = keypoints[15][1]
             head_y = keypoints[0][1]
@@ -41,6 +43,11 @@ while cap.isOpened():
             right_hand_y = keypoints[9][1]
 
             if prev_hip_y is not None:
+                # 计算阈值 # 设置阈值，动作需要超过这个幅度
+                threshold_hip = height * 0.005
+                threshold_foot = height * 0.005
+                threshold_hand = height * 0.005
+
                 if abs(hip_y - prev_hip_y) > threshold_hip:
                     # 判断手向上的时候，髋部是否向上
                     cur_left_hand_head_distance = abs(left_hand_y - head_y) # 判断手相对头部的运动方向
