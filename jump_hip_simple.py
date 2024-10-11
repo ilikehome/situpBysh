@@ -83,7 +83,7 @@ while cap.isOpened():
 
     # 显示视频帧（可选）
     cv2.imshow('Frame', resized_frame)
-    time.sleep(0.1)
+    time.sleep(1)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
