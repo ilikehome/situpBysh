@@ -47,7 +47,7 @@ while cap.isOpened():
                 threshold_hip = height * 0.005
                 threshold_foot = height * 0.005
                 threshold_hand = height * 0.005
-                jump_left_right_foot_diff_threshold = height * 0.5
+                jump_left_right_foot_diff_threshold = height * 0.02
 
                 if abs(hip_y - prev_hip_y) > threshold_hip:
                     # 判断手向上的时候，髋部是否向上
@@ -65,10 +65,11 @@ while cap.isOpened():
                     if prev_foot_y is not None:
                         if (hip_y < prev_hip_y and foot_y < prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot) or (hip_y > prev_hip_y and foot_y > prev_foot_y and abs(foot_y - prev_foot_y) > threshold_foot):# 判断脚与髋的运动一致性
                             # 判断两脚之间高度差异
-                            left_foot_y = keypoints[14][1]
-                            right_foot_y = keypoints[11][1]
+                            left_foot_y = keypoints[16][1]
+                            right_foot_y = keypoints[15][1]
                             foot_diff = abs(left_foot_y - right_foot_y)
                             if hip_y < prev_hip_y and foot_diff < jump_left_right_foot_diff_threshold:
+                                print(f"foot_diff/height：{foot_diff/height}，    foot_diff：{foot_diff}，    jump_left_right_foot_diff_threshold：{jump_left_right_foot_diff_threshold}，   height：{height}")
                                 # 判断为向上跳起阶段
                                 is_jumping_up = True
                             elif is_jumping_up and hip_y > prev_hip_y:
