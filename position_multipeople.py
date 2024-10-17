@@ -4,7 +4,7 @@ from ultralytics import YOLO
 
 model = YOLO("yolov8n-pose.pt")
 
-def process_frame(frame):
+def process_frame(frame, n):
     detections = model(frame)[0]
     frame_width = frame.shape[1]
     frame_height = frame.shape[0]
@@ -26,7 +26,7 @@ def process_frame(frame):
             person_center = ((x1 + x2) / 2, (y1 + y2) / 2)
             if sub_rect_start_x <= person_center[0] < sub_rect_start_x + sub_rect_width and sub_rect_start_y <= person_center[1] < sub_rect_start_y + sub_rect_height:
                 people.append(detection)
-    if len(people) <= 5:
+    if len(people) == n:
         for person in people:
             results.append(person)
     else:
@@ -51,13 +51,14 @@ def process_frame(frame):
     return results
 
 mp4path = "3.mp4"
+n = 3  # 期望的人数
 
 cap = cv2.VideoCapture(mp4path)
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
-    frame_results = process_frame(frame)
+    frame_results = process_frame(frame, n)
     cv2.imshow('Frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
