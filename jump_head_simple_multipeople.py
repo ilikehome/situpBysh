@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
+
 def process_video(mp4_path_zn, n):
     model = YOLO("yolov8n-pose.pt")
     cap = cv2.VideoCapture(mp4_path_zn)
@@ -13,7 +14,9 @@ def process_video(mp4_path_zn, n):
     sub_rect_height = frame_height * 0.7
     sub_rect_start_x = center_x - sub_rect_width // 2
     sub_rect_start_y = center_y - sub_rect_height // 2
-    sub_rectangles = [(sub_rect_start_x + i * sub_rect_width // 5, sub_rect_start_y, sub_rect_start_x + (i + 1) * sub_rect_width // 5, sub_rect_start_y + sub_rect_height) for i in range(5)]
+    sub_rectangles = [(sub_rect_start_x + i * sub_rect_width // 5, sub_rect_start_y,
+                       sub_rect_start_x + (i + 1) * sub_rect_width // 5, sub_rect_start_y + sub_rect_height) for i in
+                      range(5)]
     results = []
     while cap.isOpened():
         ret, frame = cap.read()
@@ -24,7 +27,8 @@ def process_video(mp4_path_zn, n):
         for detection in detections:
             if detection["class"] == 0:  # Assuming person class is 0
                 person_center = (detection["xcenter"], detection["ycenter"])
-                if sub_rect_start_x <= person_center[0] < sub_rect_start_x + sub_rect_width and sub_rect_start_y <= person_center[1] < sub_rect_start_y + sub_rect_height:
+                if sub_rect_start_x <= person_center[0] < sub_rect_start_x + sub_rect_width and sub_rect_start_y <= \
+                        person_center[1] < sub_rect_start_y + sub_rect_height:
                     people.append(detection)
         if len(people) == n:
             for person in people:
@@ -32,7 +36,9 @@ def process_video(mp4_path_zn, n):
         else:
             sub_results = [None] * 5
             for i, sub_rect in enumerate(sub_rectangles):
-                sub_people = [person for person in people if sub_rect[0] <= person["xcenter"] < sub_rect[2] and sub_rect[1] <= person["ycenter"] < sub_rect[3]]
+                sub_people = [person for person in people if
+                              sub_rect[0] <= person["xcenter"] < sub_rect[2] and sub_rect[1] <= person["ycenter"] <
+                              sub_rect[3]]
                 if len(sub_people) == 1:
                     sub_results[i] = sub_people[0]
                 elif len(sub_people) > 1:
@@ -41,8 +47,20 @@ def process_video(mp4_path_zn, n):
                     elif i in [2, 4]:
                         sub_results[i] = max(sub_people, key=lambda x: x["ycenter"])
             results = [result for result in sub_results if result is not None]
+
+        # 绘制 sub_rectangles 对应的矩形框
+        for rect in sub_rectangles:
+            cv2.rectangle(frame, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 0), 2)
+
+        # 显示当前帧
+        cv2.imshow('Frame', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
     cap.release()
+    cv2.destroyAllWindows()
     return results
+
 
 mp4path = "3.mp4"
 n = 3  # 期望的人数
