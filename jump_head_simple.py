@@ -10,7 +10,7 @@ logging.getLogger('ultralytics').setLevel(logging.WARNING)
 
 model = YOLO('yolov8n-pose.pt')
 
-video_path = 'jump9.mp4'
+video_path = 'jump12.mp4'
 cap = cv2.VideoCapture(video_path)
 
 jump_counter = 0
