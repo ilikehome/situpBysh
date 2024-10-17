@@ -1,10 +1,9 @@
 import cv2
-import numpy as np
 from ultralytics import YOLO
 
 model = YOLO("yolov8n-pose.pt")
 
-def process_frame(frame):
+def filter_result(frame):
     detections = model(frame)[0]
     frame_width = frame.shape[1]
     frame_height = frame.shape[0]
@@ -17,7 +16,6 @@ def process_frame(frame):
     sub_rectangles = [(sub_rect_start_x + i * sub_rect_width // 5, sub_rect_start_y,
                        sub_rect_start_x + (i + 1) * sub_rect_width // 5, sub_rect_start_y + sub_rect_height) for i in
                       range(5)]
-    results = []
     people = []
     for detection in detections:
         box = detection.boxes
@@ -37,13 +35,12 @@ def process_frame(frame):
                 sub_results[i] = min(sub_people, key=lambda x: x[1][1])[0]
             elif i in [2, 4]:
                 sub_results[i] = max(sub_people, key=lambda x: x[1][1])[0]
-    results = [result for result in sub_results if result is not None]
 
     # 绘制 sub_rectangles 对应的矩形框
     for rect in sub_rectangles:
         cv2.rectangle(frame, (int(rect[0]), int(rect[1])), (int(rect[2]), int(rect[3])), (0, 255, 0), 2)
 
-    return results
+    return sub_results
 
 mp4path = "3.mp4"
 
@@ -52,7 +49,7 @@ while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
-    frame_results = process_frame(frame)
+    frame_results = filter_result(frame)
     cv2.imshow('Frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
