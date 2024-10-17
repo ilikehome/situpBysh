@@ -36,7 +36,6 @@ while cap.isOpened():
         threshold_head_ok = None
         threshold_foot_ok = None
         head_foot_same_direction = None
-        foot_diff_ok = None
         keypoints = result.keypoints.xyn[0]
         confidences = result.keypoints.conf[0]
         if len(keypoints) > 0:
@@ -73,7 +72,7 @@ while cap.isOpened():
 
             prev_foot_y = foot_y
             prev_head_y = head_y
-        print(f"头阈值:{threshold_head_ok}，脚阈值:{threshold_foot_ok}，头脚一致:{head_foot_same_direction}，左右脚:{foot_diff_ok}，方向up:{is_jumping_up}，跳绳次数：{jump_counter}")
+        print(f"头阈值:{threshold_head_ok}，脚阈值:{threshold_foot_ok}，头脚一致:{head_foot_same_direction}，方向up:{is_jumping_up}，跳绳次数：{jump_counter}")
 
     # 显示视频帧（可选）
     cv2.imshow('Frame', resized_frame)
