@@ -8,18 +8,20 @@ from ultralytics import YOLO
 # 设置日志级别为 WARNING 或更高，以抑制 INFO 级别的日志输出
 logging.getLogger('ultralytics').setLevel(logging.WARNING)
 
+class PersonJumpingCounter:
+    def __init__(self):
+        self.jump_counter = 0
+        self.prev_head_y = None
+        self.prev_foot_y = None
+        self.prev_hand_head_distance = None
+        self.is_jumping_up = False
+
 model = YOLO('yolov8n-pose.pt')
 
 video_path = 'jump12.mp4'
 cap = cv2.VideoCapture(video_path)
 
-jump_counter = 0
-prev_head_y = None
-prev_foot_y = None
-prev_hand_head_distance = None
-is_jumping_up = False
-
-frame_counter = 0
+person_counter = PersonJumpingCounter()
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -51,28 +53,28 @@ while cap.isOpened():
             foot_y = (left_foot_y + right_foot_y) / 2
             height = abs(foot_y - head_y)
 
-            if prev_head_y is not None and prev_foot_y is not None:
+            if person_counter.prev_head_y is not None and person_counter.prev_foot_y is not None:
                 # 计算阈值 # 设置阈值，动作需要超过这个幅度
                 threshold_head = height * 0.01
                 threshold_foot = height * 0.01
 
-                threshold_head_ok = abs(head_y - prev_head_y) > threshold_head
-                threshold_foot_ok = abs(foot_y - prev_foot_y) > threshold_foot
-                head_foot_same_direction = (head_y < prev_head_y and foot_y < prev_foot_y) or (head_y > prev_head_y and foot_y > prev_foot_y)
+                threshold_head_ok = abs(head_y - person_counter.prev_head_y) > threshold_head
+                threshold_foot_ok = abs(foot_y - person_counter.prev_foot_y) > threshold_foot
+                head_foot_same_direction = (head_y < person_counter.prev_head_y and foot_y < person_counter.prev_foot_y) or (head_y > person_counter.prev_head_y and foot_y > person_counter.prev_foot_y)
 
                 if threshold_head_ok and threshold_foot_ok and head_foot_same_direction:
                     # 判断两脚之间高度差异
-                    if head_y < prev_head_y:
+                    if head_y < person_counter.prev_head_y:
                         # 判断为向上跳起阶段
-                        is_jumping_up = True
-                    elif is_jumping_up and head_y > prev_head_y:
+                        person_counter.is_jumping_up = True
+                    elif person_counter.is_jumping_up and head_y > person_counter.prev_head_y:
                         # 判断为落下阶段且之前有向上跳起，认为跳了一次绳
-                        jump_counter += 1
-                        is_jumping_up = False
+                        person_counter.jump_counter += 1
+                        person_counter.is_jumping_up = False
 
-            prev_foot_y = foot_y
-            prev_head_y = head_y
-        print(f"头阈值:{threshold_head_ok}，脚阈值:{threshold_foot_ok}，头脚一致:{head_foot_same_direction}，方向up:{is_jumping_up}，跳绳次数：{jump_counter}")
+            person_counter.prev_foot_y = foot_y
+            person_counter.prev_head_y = head_y
+        print(f"头阈值:{threshold_head_ok}，脚阈值:{threshold_foot_ok}，头脚一致:{head_foot_same_direction}，方向up:{person_counter.is_jumping_up}，跳绳次数：{person_counter.jump_counter}")
 
     # 显示视频帧（可选）
     cv2.imshow('Frame', resized_frame)
