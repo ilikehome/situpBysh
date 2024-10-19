@@ -32,7 +32,7 @@ while cap.isOpened():
     new_height = int(frame.shape[0] * 0.5)
     resized_frame = cv2.resize(frame, (new_width, new_height))
 
-    results = model(resized_frame)
+    results = model(resized_frame)[0]
 
     for result in results:
         threshold_head_ok = None
