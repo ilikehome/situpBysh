@@ -33,9 +33,12 @@ def divide_frame_and_detect_people(frame):
         start_percentage = (n - i) * slice_percentage
         end_percentage = start_percentage + slice_percentage
         for result in filtered_results:
+            box = result.boxes
             keypoints = result.keypoints.xyn[0]
-            if keypoints is not None and len(keypoints) > 0:
-                center_x = (keypoints[0][0] + keypoints[15][0]) / 2
+            if box is not None:
+                x1, y1, x2, y2 = box.xyxyn[0]
+                person_center = ((x1 + x2) / 2, (y1 + y2) / 2)
+                center_x = person_center[0]
                 # 判断人的中心点是否在当前小矩形区域内
                 if start_percentage <= center_x < end_percentage:
                     # 如果小矩形区域序号为偶数
@@ -47,7 +50,6 @@ def divide_frame_and_detect_people(frame):
                         # 如果字典为空或者当前人的脚部 y 坐标小于字典中已有的人的脚部 y 坐标
                         if i not in people_dict or keypoints[15][1] < people_dict[i].keypoints.xyn[0][15][1]:
                             people_dict[i] = result
-                    break
     return people_dict
 
 while cap.isOpened():
