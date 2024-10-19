@@ -4,7 +4,7 @@ import traceback
 import cv2
 import numpy as np
 import torch
-#from flask import request, jsonify
+# from flask import request, jsonify
 
 import os
 import sys
@@ -12,7 +12,7 @@ import sys
 import logging
 from ultralytics import YOLO
 
-sys.path.append('..'+ os.sep +'integrated')
+sys.path.append('..' + os.sep + 'integrated')
 # from integrated_flask import app, device, model
 
 # app = Flask(__name__)
@@ -45,6 +45,7 @@ class PersonWavingStatus:
 
 global_five_person_status = [PersonWavingStatus() for _ in range(5)]
 
+
 # 截取一个区域内的人脸来识别，避免四周过多干扰
 def clipped(image, x1, y1, x2, y2):
     assert x2 > x1
@@ -72,7 +73,6 @@ def split_frame_right_to_left(frame):
         start_x = end_x
     slices.append(frame[:, :start_x])
     return slices
-
 
 
 def is_raise(keypoints, one_person_status):
@@ -143,7 +143,7 @@ if __name__ == "__main__":
             for person_status in global_five_person_status:
                 person_status.reset()
 
-        sport_type = 2
+        sport_type = "2"
         raise_result_dict = {}
         if sport_type == "1":  # 跳绳
             raise_result_dict = {i + 1: value for i, value in enumerate(raise_result)}
@@ -151,10 +151,16 @@ if __name__ == "__main__":
             raise_result_dict = {i + 1: raise_result[i + 1] for i in range(3)}
 
         print(raise_result_dict)
+
+        # 在视频上从左到右等距离画 5 个框
+        box_width = w // 5
+        for i in range(5):
+            start_x = i * box_width
+            end_x = start_x + box_width
+            cv2.rectangle(frame, (start_x, 0), (end_x, h), (0, 255, 0), 2)
         cv2.imshow('Frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     cap.release()
     cv2.destroyAllWindows()
-
