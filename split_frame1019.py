@@ -30,8 +30,7 @@ def divide_frame_and_detect_people(frame):
     results = model(frame)
     filtered_results = filter_people(results)
     for i in range(n, 0, -1):
-        # 计算起始和结束位置的百分比
-        start_percentage = (n-i) * slice_percentage
+        start_percentage = (n - i) * slice_percentage
         end_percentage = start_percentage + slice_percentage
         for result in filtered_results:
             keypoints = result.keypoints.xyn[0]
@@ -41,13 +40,12 @@ def divide_frame_and_detect_people(frame):
                 if start_percentage <= center_x < end_percentage:
                     # 如果小矩形区域序号为偶数
                     if i % 2 == 0:
-                        # 如果字典为空或者当前人的头部 y 坐标大于字典中已有的人的头部 y 坐标
-                        if not people_dict or keypoints[0][1] > list(people_dict.values())[0].keypoints.xyn[0][0][1]:
+                        # 如果字典为空或者当前人的脚部 y 坐标大于字典中已有的人的脚部 y 坐标
+                        if i not in people_dict or keypoints[15][1] > people_dict[i].keypoints.xyn[0][15][1]:
                             people_dict[i] = result
-                    # 如果小矩形区域序号为奇数
                     else:
-                        # 如果字典为空或者当前人的头部 y 坐标小于字典中已有的人的头部 y 坐标
-                        if not people_dict or keypoints[0][1] < list(people_dict.values())[0].keypoints.xyn[0][0][1]:
+                        # 如果字典为空或者当前人的脚部 y 坐标小于字典中已有的人的脚部 y 坐标
+                        if i not in people_dict or keypoints[15][1] < people_dict[i].keypoints.xyn[0][15][1]:
                             people_dict[i] = result
                     break
     return people_dict
