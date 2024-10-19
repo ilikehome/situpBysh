@@ -4,7 +4,7 @@ import traceback
 import cv2
 import numpy as np
 import torch
-from flask import request, jsonify
+#from flask import request, jsonify
 
 import os
 import sys
