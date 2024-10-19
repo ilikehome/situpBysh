@@ -6,7 +6,7 @@ from ultralytics import YOLO
 logging.getLogger('ultralytics').setLevel(logging.WARNING)
 
 model = YOLO('yolov8n-pose.pt')
-video_path = 'rasie_hand_fail_1.mp4'
+video_path = 'rasie_hand_fail_2.mp4'
 cap = cv2.VideoCapture(video_path)
 n = 5  # 假设 n 为 5，可根据实际情况调整
 
@@ -60,6 +60,11 @@ while cap.isOpened():
     # 划分视频帧并检测人所在的小矩形区域，得到包含小矩形区域序号和对应检测结果的字典
     people_info = divide_frame_and_detect_people(frame)
     print([key for key in people_info])
+
+    # 在视频帧上从左到右画上 n 根竖线
+    step_width = frame.shape[1] // n
+    for i in range(1, n):
+        cv2.line(frame, (i * step_width, 0), (i * step_width, frame.shape[0]), (255, 0, 0), 2)
 
     # 在这两行代码中间加入的代码
     for index, result in people_info.items():
