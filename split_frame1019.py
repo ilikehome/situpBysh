@@ -53,26 +53,21 @@ def divide_frame_and_detect_people(frame):
     people_dict (dict): 包含小矩形区域序号和对应检测结果的字典。
     """
     height, width, _ = frame.shape
-    # 计算每个小矩形区域的宽度
-    slice_width = width // n
+    # 每个小矩形区域占总宽度的比例
+    slice_percentage = 1 / n
     people_dict = {}
-    # 使用 YOLO 模型对视频帧进行检测
     results = model(frame)
-    # 过滤出符合脚部位置条件的检测结果
     filtered_results = filter_people(results)
-    # 从右到左遍历小矩形区域
     for i in range(n - 1, -1, -1):
-        start_x = i * slice_width
-        end_x = start_x + slice_width
-        # 遍历过滤后的检测结果
+        # 计算起始和结束位置的百分比
+        start_percentage = i * slice_percentage
+        end_percentage = start_percentage + slice_percentage
         for result in filtered_results:
             keypoints = result.keypoints.xyn[0]
-            # 确保关键点存在且数量大于 0
             if keypoints is not None and len(keypoints) > 0:
-                # 计算人的中心点 x 坐标
                 center_x = (keypoints[0][0] + keypoints[15][0]) / 2
                 # 判断人的中心点是否在当前小矩形区域内
-                if start_x <= center_x < end_x:
+                if start_percentage <= center_x < end_percentage:
                     # 如果小矩形区域序号为偶数
                     if i % 2 == 0:
                         # 如果字典为空或者当前人的头部 y 坐标大于字典中已有的人的头部 y 坐标
