@@ -20,7 +20,7 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 print(device)
 logging.getLogger('ultralytics').setLevel(logging.WARNING)
 
-model = YOLO('../model/yolov8n-pose.pt').to(device)
+model = YOLO('pre-trained_yolo/yolov8n-pose.pt').to(device)
 
 
 class PersonWavingStatus:
